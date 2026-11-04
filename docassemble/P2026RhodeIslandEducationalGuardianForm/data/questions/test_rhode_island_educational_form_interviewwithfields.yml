@@ -1,0 +1,781 @@
+---
+include:
+  - docassemble.AssemblyLine:assembly_line.yml
+  - docassemble.ALAnyState:any_state.yml
+---
+metadata:
+  title: |-
+    Rhode Island Authorization for Release of Educational Records and Appointment of Guardian
+  short title: |-
+    RI Educational Guardian
+  description: |-
+    This form allows you to designate a caregiver to access your child's educational records and make decisions on their behalf. It's essential for ensuring your child's educational needs are met if you are unable to care for them.
+  can_I_use_this_form: |
+    You can use this form if you need to appoint someone to handle educational matters for your child. This is especially useful if you might be unavailable due to detention or other reasons.
+  before_you_start: |
+    ### Before you get started
+    - Gather your child's information, including their names and dates of birth.
+    - Identify a trusted caregiver who will act on your behalf.
+
+    ### When you are finished
+    - We strongly recommend signing in front of a notary public.
+    - Keep a copy of the signed document for your records.
+  when_you_are_finished: |
+    After completing the form, make sure to keep a signed copy for yourself and provide a copy to the appointed caregiver. This will help ensure they can act on your behalf when needed.
+  efiling_enabled: False
+  integrated_efiling: False
+  integrated_email_filing: False
+  requires_notarization: False
+  unlisted: False
+  landing_page_url: >-
+    https://courtformsonline.org/
+  maturity: beta
+  estimated_completion_minutes: 15
+  estimated_completion_delta: ""
+  LIST_topics:
+    - ED-12-00-00-00
+  tags:
+    - "CO-00-00-00-00"
+  authors:
+    - Court Forms Online
+  original_form: 
+    - https://www.centerforjustice.org/fpp/overview
+  original_form_published_on: ""
+  help_page_url: >-
+    https://www.centerforjustice.org/fpp/overview
+  help_page_title: >-
+    Rhode Island Center for Justice 
+  allowed_courts: []
+  typical_role: na
+  al_weaver_version: "2.3.1"
+  generated_on: "2026-09-21"
+  languages:
+    - en
+  jurisdiction: "NAM-US-US+RI"
+  review_date: 2026-09-21
+  form_titles:
+    - Rhode Island Authorization for Release of Educational Records and Appointment of Guardian for Educational Purposes
+  form_numbers: []
+  update_notes: ""
+---
+code: |
+  # This controls the default country and list of states in address field questions
+  AL_DEFAULT_COUNTRY = "US"
+---
+code: |
+  # This controls the default state in address field questions
+  AL_DEFAULT_STATE = "RI"
+---
+code: |
+  github_repo_name = 'docassemble-TestRhodeIslandEducationalFormInterviewwithfields'
+---
+template: interview_short_title
+content: |
+    Give someone permission to make educational decisions for your child 
+---
+code: |
+  al_form_type = "other_form"
+---
+id: alweaver assemblyline settings
+initial: True
+code: |
+  # Managed by the graphical AssemblyLine settings editor.
+  allowed_courts = []
+  AL_ORGANIZATION_TITLE = 'Suffolk LIT Lab'
+  AL_ORGANIZATION_HOMEPAGE = 'https://suffolklitlab.org'
+  AL_DEFAULT_LANGUAGE = 'en'
+  AL_DEFAULT_OVERFLOW_MESSAGE = '...'
+  user_ask_role = 'unknown'
+  al_person_answering = 'user'
+  al_form_requires_digital_signature = False
+  al_typed_signature_prefix = '/s/'
+  al_typed_signature_font = ''
+  speak_text = True
+  enable_al_language = True
+  al_user_default_language = 'en'
+  al_interview_languages = ['en']
+  github_user = ''
+  al_next_steps_enabled = True
+  al_next_steps_document_title = 'Authorization'
+  al_next_steps_document_purpose = 'release'
+  al_next_steps_help_organization = 'Rhode Island Center for Justice'
+  al_next_steps_help_url = 'https://www.rijustice.org'
+  al_next_steps_generate_qr_code = False
+  al_next_steps_what_happens_next = 'After completing the form, make sure to keep a signed copy for yourself and provide a copy to the appointed caregiver. This will help ensure they can act on your behalf when needed.'
+  al_next_steps_what_can_decision_maker_do = "The appointed caregiver can discuss educational matters, receive records, and make decisions regarding your child's education. They will act in your absence to ensure your child’s needs are met."
+  al_next_steps_what_happens_if_i_win = "If the caregiver successfully takes on this role, they will be able to manage your child's educational needs. This can provide stability and support for your child during uncertain times."
+  # AL_DEFAULT_COUNTRY is set in one of your own code blocks, not here.
+  # AL_DEFAULT_STATE is set in one of your own code blocks, not here.
+  # al_form_type is set in one of your own code blocks, not here.
+  # github_repo_name is set in one of your own code blocks, not here.
+---
+id: block-9-dbfc8008
+objects:
+  - caregivers: "ALPeopleList.using(ask_number=True, target_number=1)"
+  - children: ALPeopleList.using(ask_number=True)
+  - users: ALPeopleList.using(ask_number=True)
+---
+sections:
+  - people: Parents or guardians
+  - case_details: Caregiver & children
+  - review_test_rhode_island_educational_form_interviewwithfields: Review your answers
+  - sign_and_submit: Sign & download
+---
+#################### Interview order #####################
+comment: |
+  Controls order and branching logic for questions specific to this form
+id: interview_order_test_rhode_island_educational_form_interviewwithfields
+mandatory: True
+code: |
+  al_intro_screen
+  test_rhode_island_educational_form_interviewwithfields_intro
+  child_in_ri_school
+  if not (child_in_ri_school and is_parent_or_guardian):
+    not_eligible_exit
+  user_ask_role
+  nav.set_section('people')
+  users.gather()
+  set_parts(subtitle=str(users))
+  users[0].address.address
+  set_progress(22)
+  nav.set_section('case_details')
+  caregivers.gather()
+  caregivers[0].address.address
+  children.gather()
+  for child in children:
+    child.birthdate
+    if child.age_in_years() >= 18:
+      child.adult_notice_seen
+  set_progress(45)
+  if notarized_letter_required:
+    notarized_letter_notice
+  set_progress(68)
+  nav.set_section('review_test_rhode_island_educational_form_interviewwithfields')
+  signature_date
+  store_variables_snapshot( persistent=True, data={ "zip": showifdef("users[0].address.zip"), "reached_interview_end": True, }, )
+  test_rhode_island_educational_form_interviewwithfields_preview_question
+  nav.set_section('sign_and_submit')
+  if notarized_letter_required:
+    signature_choice = "sign_after_printing"
+    saw_signature_choice = True
+  else:
+    notary_option
+    if notary_option == "print_for_notary":
+      signature_choice = "sign_after_printing"
+      saw_signature_choice = True
+  basic_questions_signature_flow
+  set_progress(100)
+  test_rhode_island_educational_form_interviewwithfields_download
+---
+id: Test rhode island educational form interview with fields intro
+continue button field: test_rhode_island_educational_form_interviewwithfields_intro
+question: What to know before you start 
+subquestion: |
+  ## You can use this form if
+
+  - Your child goes to school in Rhode Island
+  - You are the parent or legal guardian of a child in a school in Rhode Island
+
+  ## What this form does
+
+    This form lets a trusted adult (a caregiver) get your child's school records. The caregiver can also make school decisions for your child if you are unavailable.
+
+  An illness, arrest, or other emergency can prevent you from making school decisions for your child. This form allows a trusted adult to step in to make school decisions for your child when you cannot.
+
+  This does not make the caregiver your child's {legal guardian}.
+
+  ## Signing this form
+
+  A {notary} is not required for most school districts, but we recommend having the form notarized. 
+  
+  A notarized form may be easier for a school to accept and can help confirm that the signature is yours.
+---
+id: eligibility check
+question: |
+  Check if you can use this form
+fields:
+  - "1. Does your child go to school in Rhode Island?": child_in_ri_school
+    datatype: yesnoradio
+  - "2. Are you the parent or legal guardian of a child who goes to school in Rhode Island?": is_parent_or_guardian
+    datatype: yesnoradio
+---
+id: not eligible
+event: not_eligible_exit
+question: |
+  This form is not for you
+subquestion: |
+  This form only works for a child who goes to school in Rhode Island. You must be the child's parent or legal guardian. 
+
+  If you made a mistake, click **Undo** to go back.
+buttons:
+  - Exit: exit
+---
+terms:
+  green words: |
+    Tap any green word to see what it means.
+  notary: |
+    A notary (notary public) is a person licensed by the state to witness signatures. Many banks and public libraries have one, often for free.
+  caregiver: |
+    The trusted adult you are choosing to make school decisions for your child when you are not available.
+  legal guardian: |
+    A person a court has given the legal right to make decisions for a child. Only a court can make someone a legal guardian. This form does not do that.
+  legal custody: |
+    The right to make important decisions for a child, like where they go to school or what medical care they receive. Parents may share legal custody, or one parent may have it alone.
+---
+id: welcome screen
+question: |
+  ${ interview_short_title }
+subquestion: |
+  This tool helps you fill out Rhode Island's Educational Guardian form in 3 steps:
+
+  Step 1. Write or select your answers to the following questions.<br>
+  Step 2. Preview before printing.<br>
+  Step 3. Download and print the final form. 
+
+  This site is not a lawyer. If you would like a lawyer, find [your local legal aid provider](https://www.lsc.gov/what-legal-aid/find-legal-aid).
+
+    <span class="fs-5">**Click any underlined word, like {caregiver}, for its meaning.**</span>
+fields:
+  - note: |
+      ${ display_template(al_terms_of_use, scrollable=True) }
+      
+      <div class="fs-5 fw-bold">To continue, you must accept our terms of use.</div>
+  - I accept the terms of use: acknowledged_information_use
+    datatype: yesnowide
+    grid: 8
+validation code: |
+  if not acknowledged_information_use:
+    validation_error("You must accept the terms of use to continue.")
+continue button field: al_intro_screen
+---
+id: how many parents
+question: How many parents or legal guardians will sign this form?
+subquestion: |
+  If you share {legal custody} with your child's other parent or legal guardian, **both of you should sign.** 
+  
+  If you have sole legal custody or are the child's only parent or legal guardian, you can sign alone.
+fields:
+  - no label: users.target_number
+    datatype: radio
+    choices:
+      - 1
+      - 2
+---
+id: caregiver address
+sets:
+  - "caregivers[i].address.address"
+  - "caregivers[i].address.city"
+  - "caregivers[i].address.zip"
+  - "caregivers[i].address.unit"
+  - "caregivers[i].address.state"
+  - "caregivers[i].address.country"
+question: "What is the caregiver's address?"
+fields:
+  - code: |
+      caregivers[i].address_fields(country_code=AL_DEFAULT_COUNTRY, default_state=AL_DEFAULT_STATE, required={'zip': True})
+---
+id: user address
+sets:
+  - "users[i].address.address"
+  - "users[i].address.city"
+  - "users[i].address.zip"
+  - "users[i].address.unit"
+  - "users[i].address.state"
+  - "users[i].address.country"
+question: |
+  % if i == 0 and al_person_answering == "user":
+  What is your address?
+  % else:
+  What is ${ users[i] }'s address?
+  % endif
+fields:
+  - label: "Where does ${ users[i] } live?"
+    field: users[i].address
+    datatype: object_radio
+    choices:
+      - users[0].address if defined("users[0].address.address") else None
+    object labeler: "lambda y: y.on_one_line()"
+    none of the above: Somewhere else
+    disable others: True
+    show if:
+      code: |
+        i > 0 and defined("users[0].address.address")
+  - code: |
+      users[i].address_fields(country_code=AL_DEFAULT_COUNTRY, default_state=AL_DEFAULT_STATE, required={'zip': True})
+---
+id: notarize now
+question: |
+  Signing your form
+subquestion: |
+  **You do not need a notary to sign this form.** Only Providence schools ask for a notarized letter.
+
+  <div class="alert alert-warning">
+  <strong>We strongly recommend using a notary, because:</strong>
+  <ul class="mb-0">
+  <li><strong>It proves who you are.</strong> A notary checks your ID to make sure you are the person signing.</li>
+  <li><strong>It makes your signature more trustworthy.</strong> It helps schools, courts, and other organizations trust that the right person signed.</li>
+  </ul>
+  </div>
+
+  A notary cannot sign on this screen. **If you want a notary, you will print the form and sign it in front of them.**
+fields:
+  - "Do you want to use a notary to sign this form?": notary_option
+    datatype: radio
+    choices:
+      - "Sign without a notary": no_notary
+      - "Print the form and sign it in front of a notary": print_for_notary
+---
+comment: |
+  The questions below are copies of the questions in AssemblyLine's
+  ql_baseline.yml, rewritten to name this interview's own objects instead of the
+  generic `x`. Edit them freely: they replace the AssemblyLine versions. Delete
+  one to go back to the AssemblyLine wording.
+---
+#################### School district logic #####################
+comment: |
+  Districts that require a notarized permission letter from the parent before
+  a non-parent can register a child. Verified so far:
+    Providence - https://www.providenceschools.org/registration/registration/registration-requirements
+  Every other district falls back to the general notary recommendation on the
+  intro screen. Add a district to this list once its rules are confirmed.
+code: |
+  districts_requiring_notarized_letter = ["Providence"]
+---
+code: |
+  notarized_letter_children = [child for child in children if child.school_district in districts_requiring_notarized_letter]
+  notarized_letter_required = len(notarized_letter_children) > 0
+---
+code: |
+  adult_children = [child for child in children if child.age_in_years() >= 18]
+  adult_child_present = len(adult_children) > 0
+---
+id: notarized letter notice
+continue button field: notarized_letter_notice
+question: |
+  ${ notarized_letter_children[0].name.first }'s school is in ${ notarized_letter_children[0].school_district }
+subquestion: |
+  Providence has a special rule.
+
+  If your caregiver signs ${ notarized_letter_children[0].name.first } up for school, they **must** show a letter from you. The letter must be signed in front of a notary. **To be safe, sign this form in front of a notary.**
+---
+id: adult child notice
+continue button field: children[i].adult_notice_seen
+question: |
+  ${ children[i].name.first } is 18 or older
+subquestion: |
+  <div class="alert alert-danger">This form is written for children under 18. It may not work for ${ children[i].name.first }.</div>
+
+---
+id: caregivers names
+question: Who will be the caregiver?
+subquestion: |
+  The caregiver is the adult you are giving permission to make school decisions for your child while you are unavailable.
+
+  The caregiver will be able to:
+
+  - Get your child's school records, including special education, counseling, and medical records
+  - Talk to school staff about your child
+  - Make decisions about your child's school, classroom, or program
+  - Make decisions about services your child gets at school, including special education
+
+  This stays in effect until you cancel it in writing or your child turns 18.
+fields:
+  - code: |
+      caregivers[i].name_fields()
+sets:
+  - "caregivers[i].name.first"
+  - "caregivers[i].name.last"
+  - "caregivers[i].name.middle"
+  - "caregivers[i].name.suffix"
+---
+id: how many children
+question: How many children are you listing on this form?
+subquestion: |
+  You can list up to 4 children on this form. If you have more than 4 children, you can fill out this form again for the other children.
+fields:
+  - Number of children: children.target_number
+    datatype: radio
+    choices:
+      - 1
+      - 2
+      - 3
+      - 4
+---
+id: children names
+sets:
+  - children[i].name.first
+  - children[i].name.last
+  - children[i].name.middle
+  - children[i].name.suffix
+question: |
+  % if hasattr(children, 'ask_number') and children.ask_number and int(children.target_number) == 1:
+  What is your child's name?
+  % else:
+  % if i == 0:
+  What is the name of your oldest child?
+  % else:
+  What is the name of your next oldest child?
+  % endif
+  % endif
+fields:
+  - code: |
+           children[i].name_fields()
+  - "What school district is this child's school in?": children[i].school_district
+    datatype: dropdown
+    choices:
+      - Barrington: Barrington
+      - Bristol Warren: Bristol Warren
+      - Burrillville: Burrillville
+      - Central Falls: Central Falls
+      - Chariho: Chariho
+      - Coventry: Coventry
+      - Cranston: Cranston
+      - Cumberland: Cumberland
+      - East Greenwich: East Greenwich
+      - East Providence: East Providence
+      - Exeter-West Greenwich: Exeter-West Greenwich
+      - Foster: Foster
+      - Foster-Glocester: Foster-Glocester
+      - Glocester: Glocester
+      - Jamestown: Jamestown
+      - Johnston: Johnston
+      - Lincoln: Lincoln
+      - Little Compton: Little Compton
+      - Middletown: Middletown
+      - Narragansett: Narragansett
+      - New Shoreham: New Shoreham
+      - Newport: Newport
+      - North Kingstown: North Kingstown
+      - North Providence: North Providence
+      - North Smithfield: North Smithfield
+      - Pawtucket: Pawtucket
+      - Portsmouth: Portsmouth
+      - Providence: Providence
+      - Scituate: Scituate
+      - Smithfield: Smithfield
+      - South Kingstown: South Kingstown
+      - Tiverton: Tiverton
+      - Warwick: Warwick
+      - West Warwick: West Warwick
+      - Westerly: Westerly
+      - Woonsocket: Woonsocket
+      - Other or charter school: Other or charter school
+    help: |
+      Not sure? Check a letter from the school, or ask the school office.
+---
+id: another child
+question: |
+  Is there another child to tell us about?
+fields:
+  - no label: children.there_is_another
+    datatype: yesnoradio
+---
+id: users names
+sets:
+  - users[i].name.first
+  - users[i].name.last
+  - users[i].name.middle
+  - users[i].name.suffix
+question: |
+  % if i == 0 and al_person_answering == "user":
+  What is your name?
+  % else:
+  What is the other parent or guardian's name?
+  % endif
+fields:
+  - code: |
+      users[i].name_fields()
+---
+id: another user
+question: |
+  % if al_form_type in ['starts_case', 'existing_case', 'appeal']:
+  Is anyone else on your side of this case?
+  % else:
+  Is anyone else adding their name to this form with you?
+  % endif
+subquestion: |
+  % if len(users.elements) > 1:
+  So far you have told us about ${ comma_and_list(users.complete_elements()) }.
+  % endif
+fields:
+  - no label: users.there_is_another
+    datatype: yesnoradio
+---
+id: preview test_rhode_island_educational_form_interviewwithfields
+question: |
+  Preview your form before you sign it
+subquestion: |
+  Here is a preview of the form.
+
+  **Click the image of the form to preview it. It will open in a new tab.**
+
+  ${ al_recipient_bundle.as_pdf(key='preview') }
+
+  **Use the "Edit answers" button below to edit your answers.**
+
+  ${ action_button_html(url_action('review_test_rhode_island_educational_form_interviewwithfields'), label=word('Edit answers'), color='info') }
+
+  If everything looks good, click **Next**.
+continue button field: test_rhode_island_educational_form_interviewwithfields_preview_question
+---
+id: block-26-dfa831e7
+code: |
+  signature_fields = ["users[0].signature"]
+  if len(users.elements) > 1:
+      signature_fields.append("users[1].signature")
+---
+id: test rhode island educational form interviewwithfields review screen
+event: review_test_rhode_island_educational_form_interviewwithfields
+question: |
+  Review your answers
+review:
+  - Edit: users.revisit
+    button: |
+      **Parents or guardians**
+
+      % for item in users:
+        * ${ item }
+      % endfor
+  - Edit: children.revisit
+    button: |
+      **Children**
+
+      % for item in children:
+        * ${ item }
+      % endfor
+  - Edit: caregivers.revisit
+    button: |
+      **Caregiver**
+
+      % for item in caregivers:
+        * ${ item }
+      % endfor
+---
+id: edit users
+continue button field: users.revisit
+question: |
+  Edit users
+subquestion: |
+  ${ users.table }
+
+  ${ users.add_action() }
+---
+table: users.table
+rows: users
+columns:
+  - Name: |
+      row_item.name_full() if defined("row_item.name.first") else ""
+  - Address: |
+      row_item.address.block() if defined("row_item.address.address") else ""
+  - Signature: |
+      row_item.signature if defined("row_item.signature") else ""
+edit:
+  - name.first
+  - address.address
+confirm: True
+---
+id: edit children
+continue button field: children.revisit
+question: |
+  Edit children
+subquestion: |
+  ${ children.table }
+
+  ${ children.add_action() }
+---
+table: children.table
+rows: children
+columns:
+  - Name: |
+      row_item.name_full() if defined("row_item.name.first") else ""
+  - Birthdate: |
+      row_item.birthdate if defined("row_item.birthdate") else ""
+edit:
+  - name.first
+  - birthdate
+  - school_district
+confirm: True
+---
+id: edit caregivers
+continue button field: caregivers.revisit
+question: |
+  Edit caregivers
+subquestion: |
+  ${ caregivers.table }
+
+  ${ caregivers.add_action() }
+---
+table: caregivers.table
+rows: caregivers
+columns:
+  - Name: |
+      row_item.name_full() if defined("row_item.name.first") else ""
+  - Address: |
+      row_item.address.block() if defined("row_item.address.address") else ""
+edit:
+  - name.first
+  - address.address
+confirm: True
+---
+id: download test_rhode_island_educational_form_interviewwithfields
+event: test_rhode_island_educational_form_interviewwithfields_download
+question: |
+  Your form is ready
+subquestion: |
+  Here is what you should do now: 
+  
+  1. View or download the **Next Steps Document** to see what to do next.
+
+  2. View or download the **Rhode Island Educational Guardian Form** to see your form.
+
+  If you need to change anything, click **Edit answers**.
+
+  ${ action_button_html(url_action('review_test_rhode_island_educational_form_interviewwithfields'), label=word('Edit answers'), color='info') }
+
+  <div class="alert alert-warning">
+  <strong>Important:</strong> The form says "Do not sign until you are standing in front of a notary." This only applies to you if:
+  <br>
+  <strong>1.</strong> Your child's school is in the Providence school district
+  <br>
+  <strong>OR</strong>
+  <br>
+  <strong>2.</strong> You want to sign in front of a notary
+  </div>
+
+  ${ al_user_bundle.download_list_html() }
+
+  ${ al_user_bundle.send_button_html(show_editable_checkbox=False) }
+
+progress: 100
+---
+# ALDocument objects specify the metadata for each template
+objects:
+  - test_rhode_island_educational_form_interviewwithfields_Post_interview_instructions: ALDocument.using(filename="test_rhode_island_educational_form_interviewwithfields_next_steps.docx", enabled=al_next_steps_enabled, has_addendum=False)
+  - test_rhode_island_educational_form_interviewwithfields_attachment: ALDocument.using(filename="test_rhode_island_educational_form_interviewwithfields", enabled=True, has_addendum=False)
+---
+# Bundles group the ALDocuments into separate downloads, such as for court and for the user
+objects:
+  - al_user_bundle: ALDocumentBundle.using(elements=[test_rhode_island_educational_form_interviewwithfields_Post_interview_instructions, test_rhode_island_educational_form_interviewwithfields_attachment], filename="test_rhode_island_educational_form_interviewwithfields", enabled=True)
+  - al_recipient_bundle: ALDocumentBundle.using(elements=[test_rhode_island_educational_form_interviewwithfields_attachment], filename="test_rhode_island_educational_form_interviewwithfields", enabled=True)
+---
+template: test_rhode_island_educational_form_interviewwithfields_Post_interview_instructions.title
+content: |
+  Next Steps Document
+---
+template: test_rhode_island_educational_form_interviewwithfields_attachment.title
+content: |
+  Rhode Island Educational Guardian Form
+---
+template: al_user_bundle.title
+content: |
+  All forms to download for your records
+---
+template: al_recipient_bundle.title
+content: |
+  Form to give the school 
+---
+# Each attachment defines a key in an ALDocument. We use `i` as the placeholder here so the
+# same template is used for "preview" and "final" keys, and logic in the template checks
+# the value of `i` to show or hide the user's signature
+attachment:
+  name: Post-interview-Instructions
+  filename: test_rhode_island_educational_form_interviewwithfields_next_steps
+  docx template file: next_steps_v2.docx
+  variable name: test_rhode_island_educational_form_interviewwithfields_Post_interview_instructions[i]
+  skip undefined: True
+  tagged pdf: True
+---
+attachment:
+  name: test rhode island educational form interviewwithfields
+  filename: test_rhode_island_educational_form_interviewwithfields
+  variable name: test_rhode_island_educational_form_interviewwithfields_attachment[i]
+  skip undefined: True
+  pdf template file: test_rhode_island_educational_form_interview-with-fields.pdf
+  fields:
+      - "users1_name_full": "${ users }"
+      - "users1_name_full__1": ${ users[0] }
+      - "users1_name_full__2": "${ users }"
+      - "users1_address_on_one_line": ${ users[0].address.on_one_line() }
+      - "children1_name_full": ${ children[0] }
+      - "children1_birthdate": ${ children[0].birthdate.format() }
+      - "children2_name_full": ${ children[1] }
+      - "children2_birthdate": ${ children[1].birthdate.format() }
+      - "children3_name_full": ${ children[2] }
+      - "children3_birthdate": ${ children[2].birthdate.format() }
+      - "children4_name_full": ${ children[3] }
+      - "children4_birthdate": ${ children[3].birthdate.format() }
+      - "caregivers_name_full": ${ caregivers[0] }
+      - "caregivers_address_on_one_line": ${ caregivers[0].address.on_one_line() }
+      - "users1_signature": ${ users[0].signature_if_final(i) }
+      - "signature_date": ${ signature_date.format() }
+      - "signature_date__1": ${ signature_date.format() }
+      - "users2_signature": ${ users[1].signature_if_final(i) }
+      - "users2_name_full": ${ users[1] }
+      - "notarized_county": ${ notarized_county }
+      - "notarized_month": ${ notarized_month }
+      - "notarized_year": ${ notarized_year }
+      - "notarized_day": ${ notarized_day }
+      - "notary_signature": ${ notary[0].signature_if_final(i) }
+      - "notary_name_full": ${ notary[0] }
+      - "notary_commission_expires_date": ${ notary_commission_expires_date.format() }
+---
+id: signature choice without typed
+decoration: file-signature
+question: |
+  Your documents are almost ready
+subquestion: |
+  How do you want to sign them?
+fields: 
+  - "I will sign <span class='visually-hidden'>desktop</span>": signature_choice
+    input type: radio
+    choices:
+      - On a phone with my finger: phone
+        help: |
+          % if is_sms_enabled():
+          We can text or share a link with your phone on the next screen
+          % else:
+          We can share a link with your phone on the next screen
+          % endif
+      - On this device: this_device
+    show if:
+      code: |
+        al_form_requires_digital_signature and not (
+          device() and (device().is_mobile or device().is_touch_capable)
+        )
+  - "I will sign <span class='visually-hidden'>mobile</span>": signature_choice
+    input type: radio
+    choices:
+      - On this device: this_device
+    show if:
+      code: |
+        al_form_requires_digital_signature and (
+          device() and (device().is_mobile or device().is_touch_capable)
+        )
+  - "I will sign <span class='visually-hidden'>desktop with print</span>": signature_choice
+    input type: radio
+    choices:
+      - On a phone with my finger: phone
+        help: |
+          % if is_sms_enabled():
+          We can text or share a link with your phone on the next screen
+          % else:
+          We can share a link with your phone on the next screen
+          % endif
+      - On this device: this_device
+      - On the paper with a pen after I print the documents: sign_after_printing
+    show if:
+      code: |
+        not al_form_requires_digital_signature and not (
+          device() and (device().is_mobile or device().is_touch_capable)
+        )
+  - "I will sign <span class='visually-hidden'>mobile with print</span>": signature_choice
+    input type: radio
+    choices:
+      - On this device: this_device
+      - On the paper with a pen after I print the documents: sign_after_printing
+    show if:
+      code: |
+        not al_form_requires_digital_signature and (
+          device() and (device().is_mobile or device().is_touch_capable)
+        )
+continue button field: saw_signature_choice
