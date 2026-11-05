@@ -118,17 +118,17 @@ objects:
 sections:
   - people: Parents or guardians
   - case_details: Caregiver & children
-  - review_test_rhode_island_educational_form_interviewwithfields: Review your answers
+  - review_ri_educational_guardian: Review your answers
   - sign_and_submit: Sign & download
 ---
 #################### Interview order #####################
 comment: |
   Controls order and branching logic for questions specific to this form
-id: interview_order_test_rhode_island_educational_form_interviewwithfields
+id: interview_order_ri_educational_guardian
 mandatory: True
 code: |
   al_intro_screen
-  test_rhode_island_educational_form_interviewwithfields_intro
+  ri_educational_guardian_intro
   child_in_ri_school
   if not (child_in_ri_school and is_parent_or_guardian):
     not_eligible_exit
@@ -150,10 +150,10 @@ code: |
   if notarized_letter_required:
     notarized_letter_notice
   set_progress(68)
-  nav.set_section('review_test_rhode_island_educational_form_interviewwithfields')
+  nav.set_section('review_ri_educational_guardian')
   signature_date
   store_variables_snapshot( persistent=True, data={ "zip": showifdef("users[0].address.zip"), "reached_interview_end": True, }, )
-  test_rhode_island_educational_form_interviewwithfields_preview_question
+  ri_educational_guardian_preview_question
   nav.set_section('sign_and_submit')
   if notarized_letter_required:
     signature_choice = "sign_after_printing"
@@ -165,10 +165,10 @@ code: |
       saw_signature_choice = True
   basic_questions_signature_flow
   set_progress(100)
-  test_rhode_island_educational_form_interviewwithfields_download
+  ri_educational_guardian_download
 ---
 id: Test rhode island educational form interview with fields intro
-continue button field: test_rhode_island_educational_form_interviewwithfields_intro
+continue button field: ri_educational_guardian_intro
 question: What to know before you start 
 subquestion: |
   ## You can use this form if
@@ -501,7 +501,7 @@ fields:
   - no label: users.there_is_another
     datatype: yesnoradio
 ---
-id: preview test_rhode_island_educational_form_interviewwithfields
+id: preview ri_educational_guardian
 question: |
   Preview your form before you sign it
 subquestion: |
@@ -513,10 +513,10 @@ subquestion: |
 
   **Use the "Edit answers" button below to edit your answers.**
 
-  ${ action_button_html(url_action('review_test_rhode_island_educational_form_interviewwithfields'), label=word('Edit answers'), color='info') }
+  ${ action_button_html(url_action('review_ri_educational_guardian'), label=word('Edit answers'), color='info') }
 
   If everything looks good, click **Next**.
-continue button field: test_rhode_island_educational_form_interviewwithfields_preview_question
+continue button field: ri_educational_guardian_preview_question
 ---
 id: block-26-dfa831e7
 code: |
@@ -525,7 +525,7 @@ code: |
       signature_fields.append("users[1].signature")
 ---
 id: test rhode island educational form interviewwithfields review screen
-event: review_test_rhode_island_educational_form_interviewwithfields
+event: review_ri_educational_guardian
 question: |
   Review your answers
 review:
@@ -617,8 +617,8 @@ edit:
   - address.address
 confirm: True
 ---
-id: download test_rhode_island_educational_form_interviewwithfields
-event: test_rhode_island_educational_form_interviewwithfields_download
+id: download ri_educational_guardian
+event: ri_educational_guardian_download
 question: |
   Your form is ready
 subquestion: |
@@ -630,7 +630,7 @@ subquestion: |
 
   If you need to change anything, click **Edit answers**.
 
-  ${ action_button_html(url_action('review_test_rhode_island_educational_form_interviewwithfields'), label=word('Edit answers'), color='info') }
+  ${ action_button_html(url_action('review_ri_educational_guardian'), label=word('Edit answers'), color='info') }
 
   <div class="alert alert-warning">
   <strong>Important:</strong> The form says "Do not sign until you are standing in front of a notary." This only applies to you if:
@@ -650,19 +650,19 @@ progress: 100
 ---
 # ALDocument objects specify the metadata for each template
 objects:
-  - test_rhode_island_educational_form_interviewwithfields_Post_interview_instructions: ALDocument.using(filename="test_rhode_island_educational_form_interviewwithfields_next_steps.docx", enabled=al_next_steps_enabled, has_addendum=False)
-  - test_rhode_island_educational_form_interviewwithfields_attachment: ALDocument.using(filename="test_rhode_island_educational_form_interviewwithfields", enabled=True, has_addendum=False)
+  - ri_educational_guardian_Post_interview_instructions: ALDocument.using(filename="ri_educational_guardian_next_steps.docx", enabled=al_next_steps_enabled, has_addendum=False)
+  - ri_educational_guardian_attachment: ALDocument.using(filename="ri_educational_guardian", enabled=True, has_addendum=False)
 ---
 # Bundles group the ALDocuments into separate downloads, such as for court and for the user
 objects:
-  - al_user_bundle: ALDocumentBundle.using(elements=[test_rhode_island_educational_form_interviewwithfields_Post_interview_instructions, test_rhode_island_educational_form_interviewwithfields_attachment], filename="test_rhode_island_educational_form_interviewwithfields", enabled=True)
-  - al_recipient_bundle: ALDocumentBundle.using(elements=[test_rhode_island_educational_form_interviewwithfields_attachment], filename="test_rhode_island_educational_form_interviewwithfields", enabled=True)
+  - al_user_bundle: ALDocumentBundle.using(elements=[ri_educational_guardian_Post_interview_instructions, ri_educational_guardian_attachment], filename="ri_educational_guardian", enabled=True)
+  - al_recipient_bundle: ALDocumentBundle.using(elements=[ri_educational_guardian_attachment], filename="ri_educational_guardian", enabled=True)
 ---
-template: test_rhode_island_educational_form_interviewwithfields_Post_interview_instructions.title
+template: ri_educational_guardian_Post_interview_instructions.title
 content: |
   Next Steps Document
 ---
-template: test_rhode_island_educational_form_interviewwithfields_attachment.title
+template: ri_educational_guardian_attachment.title
 content: |
   Rhode Island Educational Guardian Form
 ---
@@ -679,18 +679,18 @@ content: |
 # the value of `i` to show or hide the user's signature
 attachment:
   name: Post-interview-Instructions
-  filename: test_rhode_island_educational_form_interviewwithfields_next_steps
-  docx template file: next_steps_v2.docx
-  variable name: test_rhode_island_educational_form_interviewwithfields_Post_interview_instructions[i]
+  filename: ri_educational_guardian_next_steps
+  docx template file: ri_educational_guardian_next_steps.docx
+  variable name: ri_educational_guardian_Post_interview_instructions[i]
   skip undefined: True
   tagged pdf: True
 ---
 attachment:
   name: test rhode island educational form interviewwithfields
-  filename: test_rhode_island_educational_form_interviewwithfields
-  variable name: test_rhode_island_educational_form_interviewwithfields_attachment[i]
+  filename: ri_educational_guardian
+  variable name: ri_educational_guardian_attachment[i]
   skip undefined: True
-  pdf template file: test_rhode_island_educational_form_interview-with-fields.pdf
+  pdf template file: ri_educational_guardian_authorization.pdf
   fields:
       - "users1_name_full": "${ users }"
       - "users1_name_full__1": ${ users[0] }
