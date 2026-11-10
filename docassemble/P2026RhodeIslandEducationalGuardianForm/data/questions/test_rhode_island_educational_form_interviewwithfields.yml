@@ -558,7 +558,9 @@ question: |
 subquestion: |
   ${ users.table }
 
+  % if len(users.elements) < 2:
   ${ users.add_action() }
+  % endif
 ---
 table: users.table
 rows: users
@@ -581,7 +583,11 @@ question: |
 subquestion: |
   ${ children.table }
 
+  % if len(children.elements) < 4:
   ${ children.add_action() }
+  % else:
+  This form has room for 4 children. To add another child, fill out the form again.
+  % endif
 ---
 table: children.table
 rows: children
@@ -603,7 +609,9 @@ question: |
 subquestion: |
   ${ caregivers.table }
 
+  % if len(caregivers.elements) < 1:
   ${ caregivers.add_action() }
+  % endif
 ---
 table: caregivers.table
 rows: caregivers
