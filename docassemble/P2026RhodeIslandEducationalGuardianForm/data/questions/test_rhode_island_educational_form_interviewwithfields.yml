@@ -25,7 +25,7 @@ metadata:
   efiling_enabled: False
   integrated_efiling: False
   integrated_email_filing: False
-  requires_notarization: False
+  requires_notarization: True
   unlisted: False
   landing_page_url: >-
     https://courtformsonline.org/
@@ -147,22 +147,18 @@ code: |
     if child.age_in_years() >= 18:
       child.adult_notice_seen
   set_progress(45)
-  if notarized_letter_required:
-    notarized_letter_notice
   set_progress(68)
   nav.set_section('review_ri_educational_guardian')
   signature_date
   store_variables_snapshot( persistent=True, data={ "zip": showifdef("users[0].address.zip"), "reached_interview_end": True, }, )
   ri_educational_guardian_preview_question
   nav.set_section('sign_and_submit')
-  if notarized_letter_required:
-    signature_choice = "sign_after_printing"
-    saw_signature_choice = True
-  else:
-    notary_option
-    if notary_option == "print_for_notary":
-      signature_choice = "sign_after_printing"
-      saw_signature_choice = True
+  # Every district we contacted (Nov 2026) requires the form to be notarized,
+  # so everyone signs on paper in front of a notary. To bring back the
+  # "sign without a notary" option, restore the notary_option logic
+  # preserved in the "notarize now" block below.
+  signature_choice = "sign_after_printing"
+  saw_signature_choice = True
   basic_questions_signature_flow
   set_progress(100)
   ri_educational_guardian_download
@@ -186,9 +182,9 @@ subquestion: |
 
   ## Signing this form
 
-  A {notary} is not required for most school districts, but we recommend having the form notarized. 
-  
-  A notarized form may be easier for a school to accept and can help confirm that the signature is yours.
+  **You must sign this form in front of a {notary}.** Rhode Island school districts require it before a caregiver can register a child.
+
+  Need a notary? You may be able to find one for free at your public library, your bank, or by calling United Way's 2-1-1 helpline.
 ---
 id: eligibility check
 question: |
@@ -303,6 +299,15 @@ fields:
   - code: |
       users[i].address_fields(country_code=AL_DEFAULT_COUNTRY, default_state=AL_DEFAULT_STATE, required={'zip': True})
 ---
+comment: |
+  NOT CURRENTLY USED. This screen offered a choice between signing without a
+  notary and signing in front of one. As of Nov 2026 every district we
+  contacted requires notarization, so the interview order skips this
+  question. To bring the choice back, restore this in the interview order:
+    notary_option
+    if notary_option == "print_for_notary":
+      signature_choice = "sign_after_printing"
+      saw_signature_choice = True
 id: notarize now
 question: |
   Signing your form
@@ -333,17 +338,13 @@ comment: |
 ---
 #################### School district logic #####################
 comment: |
-  Districts that require a notarized permission letter from the parent before
-  a non-parent can register a child. Verified so far:
-    Providence - https://www.providenceschools.org/registration/registration/registration-requirements
-  Every other district falls back to the general notary recommendation on the
-  intro screen. Add a district to this list once its rules are confirmed.
-code: |
-  districts_requiring_notarized_letter = ["Providence"]
----
-code: |
-  notarized_letter_children = [child for child in children if child.school_district in districts_requiring_notarized_letter]
-  notarized_letter_required = len(notarized_letter_children) > 0
+  Notarization research, Nov 2026. Ten districts contacted by phone
+  (Barrington and four others) plus Providence's published registration
+  rules all require a notarized authorization before a non-parent can
+  register a child. Because every district checked requires it, the
+  interview tells everyone to notarize. The per-district notice block
+  (notarized_letter_notice) is no longer in the interview order but is
+  kept below in case the rule ever changes.
 ---
 code: |
   adult_children = [child for child in children if child.age_in_years() >= 18]
@@ -641,13 +642,7 @@ subquestion: |
   ${ action_button_html(url_action('review_ri_educational_guardian'), label=word('Edit answers'), color='info') }
 
   <div class="alert alert-warning">
-  <strong>Important:</strong> The form says "Do not sign until you are standing in front of a notary." This only applies to you if:
-  <br>
-  <strong>1.</strong> Your child's school is in the Providence school district
-  <br>
-  <strong>OR</strong>
-  <br>
-  <strong>2.</strong> You want to sign in front of a notary
+  <strong>Important:</strong> Do not sign the form until you are standing in front of a notary. Rhode Island school districts will not accept it otherwise.
   </div>
 
   ${ al_user_bundle.download_list_html() }
@@ -688,7 +683,7 @@ content: |
 attachment:
   name: Post-interview-Instructions
   filename: ri_educational_guardian_next_steps
-  docx template file: ri_educational_guardian_next_steps.docx
+  docx template file: ri_educational_guardian_next_steps_v2.docx
   variable name: ri_educational_guardian_Post_interview_instructions[i]
   skip undefined: True
   tagged pdf: True
